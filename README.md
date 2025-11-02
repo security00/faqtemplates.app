@@ -1,36 +1,76 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+FAQ Templates App (Next.js)
+===========================
 
-## Getting Started
+An SEO‑friendly FAQ templates website built with Next.js + TypeScript + Tailwind CSS.
 
-First, run the development server:
+What’s included
+- Templates library with category filters (All, E‑commerce, SaaS, Support, Services, Healthcare, Education)
+- Preview modals and one‑click downloads for every template
+- Shopify and Word templates pages with consistent UX
+- AI Generator section on the homepage (anchors from guides CTA)
+- Guides (how‑to, tips, industry examples, FAQ)
+- Legal pages (Privacy, Terms)
+- SEO basics: robots.txt, sitemap.xml, canonical URLs, and normalized titles/descriptions
 
+Quick start
+1) Install deps and run dev server
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+# open http://localhost:3000
+```
+2) Production build
+```bash
+npm run build
+npm run start
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Key routes
+- `/` – Home + AI Generator (`/#generator`)
+- `/templates` – All template categories
+- `/templates/faq` – General FAQ templates (client filter buttons)
+- `/templates/preview/[id]` – Full template preview (falls back to placeholder)
+- `/templates/shopify` – Shopify templates (Use Template = download; Preview = modal)
+- `/templates/word` – Downloadable Word templates (RTF .doc generation)
+- `/guides/how-to-generate`, `/guides/tips-tricks`, `/guides/industry-examples`, `/guides/faq`
+- `/privacy`, `/terms`
+- `/robots.txt`, `/sitemap.xml`
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Use Template / Preview behavior
+- On template cards, “Use Template” downloads a Markdown file, “Preview” opens a centered modal with sample Q&A. The preview page also clamps metadata for SEO.
+- Shopify page follows the same pattern (download + modal). Word page downloads a `.doc` (RTF) file that opens in Microsoft Word.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Data model and placeholders
+- Template data lives in `lib/templates.ts`.
+  - `templatesById` stores curated FAQ content for ids 1–6.
+  - `getTemplateById(id)` returns a template when available.
+  - `getPlaceholderTemplate(id)` returns a generic template when a specific id has no data, so previews never 404.
+- The previews and detail page automatically use the placeholder when needed.
 
-## Learn More
+SEO setup
+- `app/robots.ts` generates `/robots.txt` and points to the sitemap.
+- `app/sitemap.ts` generates `/sitemap.xml` with the key static routes.
+- Page metadata is kept within recommended lengths: title 40–60 chars, description ~140–160 chars. The dynamic preview page trims/pads automatically.
 
-To learn more about Next.js, take a look at the following resources:
+Contact and CTAs
+- Support email: `support@faqtemplates.app`.
+- Footer “Privacy/Terms/Contact” links point to working pages (Contact uses `mailto:`).
+- Guide page CTAs link to `/#generator` for a seamless flow.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Customize / extend
+- Add a new curated template:
+  1. Create an entry in `lib/templates.ts > templatesById` with `id`, `title`, `category`, `description`, and `faqs`.
+  2. The card preview and the full `/templates/preview/[id]` page will use it automatically.
+- Change the support email: search for `support@faqtemplates.app` in `app` and `components`.
+- Swap Word downloads to real `.docx`: replace the RTF generator in `components/WordCard.tsx` with a docx builder (e.g., `docx` package) and wire to a server route if you prefer.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Coding standards
+- TypeScript + strict mode, Tailwind CSS for styling
+- Client components are marked with `"use client"` and avoid server‑only APIs
+- Accessibility: modals are centered, support Esc/overlay close; buttons have clear labels
 
-## Deploy on Vercel
+Notes
+- This project targets local/offline use and avoids network dependencies where possible. If you add external packages, ensure they work in your hosting environment.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+License
+- MIT (adjust as needed)
