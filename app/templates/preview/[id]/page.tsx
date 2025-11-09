@@ -1,15 +1,17 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { getTemplateById, getPlaceholderTemplate } from "@/lib/templates";
+import DownloadButton from "./download-button";
 
 interface PageProps {
-  params: {
+  params: Promise<{
     id: string;
-  };
+  }>;
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
-  const template = getTemplateById(params.id) || getPlaceholderTemplate(params.id);
+  const { id } = await params;
+  const template = getTemplateById(id) || getPlaceholderTemplate(id);
 
   if (!template) {
     return {
@@ -34,13 +36,14 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     title,
     description,
     alternates: {
-      canonical: `https://faqtemplates.app/templates/preview/${params.id}`,
+      canonical: `https://faqtemplates.app/templates/preview/${id}`,
     },
   };
 }
 
-export default function TemplatePreviewPage({ params }: PageProps) {
-  const template = getTemplateById(params.id) || getPlaceholderTemplate(params.id);
+export default async function TemplatePreviewPage({ params }: PageProps) {
+  const { id } = await params;
+  const template = getTemplateById(id) || getPlaceholderTemplate(id);
 
   return (
     <main className="min-h-screen bg-white">
@@ -128,15 +131,7 @@ export default function TemplatePreviewPage({ params }: PageProps) {
               >
                 Customize with AI Generator
               </a>
-              <button
-                onClick={() => {
-                  // In a real app, this would trigger a download
-                  alert('Download functionality will be implemented in the next version!');
-                }}
-                className="px-8 py-3 border border-gray-300 text-gray-700 hover:bg-gray-50 rounded-lg font-medium transition-colors"
-              >
-                Download Template
-              </button>
+              <DownloadButton />
             </div>
           </div>
         </div>
